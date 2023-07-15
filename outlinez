@@ -1,0 +1,867 @@
+Introduction
+The CleanCloud API allows you to send information into and out of CleanCloud. It is typically used for the following use cases
+
+You have made your own iOS/Android pickup and delivery app and wish to integrate with CleanCloud
+You have a smart locker that you wish to integrate with CleanCloud
+You wish to get a list of orders for a customer account using your own dashboard
+The API is a RESTful API, and requires you to use POST requests to communicate with it. You can use any programming language to communicate with the API, and we have code examples for PHP, cURL, Javascript, node.js, Python and Ruby. You can switch the code examples between languages using the dropdown at the top left.
+
+The API is rate limited to 5,000 requests per month, with a maximum of 5 requests per second. If you require more capacity please contact your CleanCloud Account Manager.
+
+Getting Started
+To begin you will need to:
+
+Have created an account with CleanCloud (https://cleancloudapp.com/register)
+Obtained your API key from the Admin->Pickup and Delivery->API section
+Once done you be able to complete the following tasks
+
+Create a customer account
+Update a customer account
+Delete a customer
+Login customer
+Get customer information
+Reset customer password
+Create an order
+Update an order
+Delete an order
+Get a Garment
+Get all Garments in Order
+Update a Garment
+Create repeat pickup
+Update Repeat Pickup
+Delete repeat pickup
+Get repeat pickups
+Create Message
+Get Messages
+Get order(s) details
+Get products
+Get pickup/delivery Dates
+Get available pickup/delivery time slots
+Get route number from Latitude/Longitude
+Get referral code and gift
+Use promo code
+Convert Loyalty Points
+Add subscription to customer account
+Delete Subscription
+Add Credit Card
+Charge Credit Card
+Get Credit Cards
+Set Default Credit Card
+Add Push Token (for your custom app)
+Delete Push Token
+Get Summary Metrics By Day
+Get Driver Location Associated with an Order
+Get Photos
+Create a Customer Account
+To create a customer account you send a POST request to https://cleancloudapp.com/api/addCustomer with the below parameters. The response will contain the ID of the newly created customer account which you will need to store on your server to perform other tasks for this customer.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerName	Name of Customer	Y
+customerTel	Telephone number of customer	Y
+customerEmail	Email of customer	Y
+customerAddress	Address of customer	
+customerAddressInstructions	Additional address instructions to help driver
+e.g. Leave with Doorman or Floor 6	
+customerRoute	Route Number of Customer	
+customerLat	Latitude of customer address	
+customerLng	Longitude of customer address	
+makeLatLng	Have CleanCloud convert customer address to Latitude / Longitude
+1 = convert address to GPS co-ordinates	
+findRoute	Have CleanCloud assign customer to route based on customer address and your geofences
+1 = assign to route based on customer address/GPS co-ordinates	
+customerNotes	Saved Notes for customer account	
+customerPassword	Password for customer account, only required if CleanCloud will handle customer login	
+customerGender	0 = Not set, 1 = Male, 2 = Female, 3 = Prefer Not to Say	
+birthdayDay	The day of the month without leading zeros (from 1 to 31)	
+birthdayMonth	The numeric representation of a month, without leading zeros (1 to 12)	
+promoCode	Invite or Promo Code that customer can use on signup	
+marketingOptIn	If a customer provides marketing permission 1 = opt in, 0 = no permission given	
+starchPreference	Starch Preference
+0 = None selected, 1 = No starch, 2 = Normal, 3 = Light, 4 = Heavy	
+shirtPreference	Shirt Presentation Preference
+0 = None selected, 1 = Hanger, 2 = Boxed, 3 = Folded	
+trouserPreference	Trouser Preference
+0 = None selected, 1 = Hanger, 2 = Boxed, 3= Folded	
+detergentType	Detergent Type
+0 = None selected, 1 = Standard, 2 = Premium	
+detergentScent	Detergent Scent
+0 = None selected, 1 = No scent, 2 = Light, 3 = Medium, 4 = Heavy, 5 = Sensitive skin	
+fabricSoftenerType	Fabric Softener
+0 = None selected, 1 = No Softener, 2 = Standard, 3 = Premium	
+whitesWashTemp	Whites Wash Temperature
+0 = None selected, 1 = Cold Wash, 2 = Warm Wash	
+whitesDryerHeat	Whites Dryer Heat
+0 = None selected, 1 = Low, 2 = Regular	
+colorsWashTemp	Colors Wash Temperature
+0 = None selected, 1 = Cold Wash, 2 = Warm Wash	
+colorsDryerHeat	Colors Dryer Heat
+0 = None selected, 1 = Low, 2 = Regular	
+stripe	Stripe customer token	
+evoToken	EVO card token	
+noEmailRequired	Set to 1 if you do not require email address to be provided	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/addCustomer');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerName': 'John Doe',
+            'customerTel': '5554432324',
+            'customerEmail': 'emailexample@email.com',
+            'customerAddress': '113 Street Avenue, New York, 10012',
+            'customerNotes': 'Notes about the customer'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Update a Customer Account
+To update a customer account you send a POST request to https://cleancloudapp.com/api/updateCustomer with the below parameters. Only submit the parameters that you wish to update.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of Customer	Y
+customerName	Name of Customer	
+customerTel	Telephone number of customer	
+customerEmail	Email of customer	
+customerAddress	Address of customer	
+customerAddressInstructions	Additional address instructions to help driver
+e.g. Leave with Doorman or Floor 6	
+customerRoute	Route Number of Customer	
+customerLat	Latitude of customer address	
+customerLng	Longitude of customer address	
+makeLatLng	Have CleanCloud convert customer address to Latitude / Longitude
+1 = convert address to GPS co-ordinates	
+findRoute	Have CleanCloud assign customer to route based on customer address and your geofences
+1 = assign to route based on customer address/GPS co-ordinates	
+birthdayDay	The day of the month without leading zeros (from 1 to 31). You must send with birthdayMonth as well.	
+birthdayMonth	The numeric representation of a month, without leading zeros (1 to 12)	
+customerPassword	Password for customer account	
+customerNotes	Saved Notes for customer account	
+starchPreference	Starch Preference
+0 = None selected, 1 = No starch, 2 = Normal, 3 = Light, 4 = Heavy	
+shirtPreference	Shirt Presentation Preference
+0 = No preference, 1 = Hanger, 2 = Boxed	
+trouserPreference	Trouser Preference
+0 = None selected, 1 = Hanger, 2 = Boxed, 3= Folded	
+detergentType	Detergent Type
+0 = None selected, 1 = Standard, 2 = Premium	
+detergentScent	Detergent Scent
+0 = None selected, 1 = No scent, 2 = Light, 3 = Medium, 4 = Heavy, 5 = Sensitive skin	
+fabricSoftenerType	Fabric Softener
+0 = None selected, 1 = No Softener, 2 = Standard, 3 = Premium	
+whitesWashTemp	Whites Wash Temperature
+0 = None selected, 1 = Cold Wash, 2 = Warm Wash	
+whitesDryerHeat	Whites Dryer Heat
+0 = None selected, 1 = Low, 2 = Regular	
+colorsWashTemp	Colors Wash Temperature
+0 = None selected, 1 = Cold Wash, 2 = Warm Wash	
+colorsDryerHeat	Colors Dryer Heat
+0 = None selected, 1 = Low, 2 = Regular	
+stripe	Stripe customer token	
+evoToken	EVO card token	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/updateCustomer');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerID': '1',
+            'customerTel': '5554432324'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Delete a Customer Account
+To update a customer account you send a POST request to https://cleancloudapp.com/api/deleteCustomer with the below parameters.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of Customer	Y
+Login to Customer Account
+To check the email and password of a customer and retrieve their customer ID you can send a POST request to https://cleancloudapp.com/api/loginCustomer with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerEmail	Email of the customer	Y
+customerPassword	Password of the customer	Y
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/loginCustomer');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerEmail': 'emailexample@email.com',
+            'customerPassword': 'thisWasMyPassword'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Get Customer Information
+To retrieve available information about a particular customer, or customers that signed up within a date range, you send a POST request to https://cleancloudapp.com/api/getCustomer with the below parameters.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the customer	
+dateFrom	Beginning date of when customer signed up (yyyy-mm-dd)	
+dateTo	End date of when customer signed up (yyyy-mm-dd)	
+excludeDeactivated	1 = Exclude deactivated customers	
+Note that the response is structured differently if you are requesting customers by date range. Date Range is also limited to 31 days.
+
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getCustomer');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerID': '1'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Reset Customer Password
+To iniate a password reset for a customer and send them an email with reset instructions you send a POST request to https://cleancloudapp.com/api/passwordCustomer with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerEmail	Email of the customer	Y
+Create an Order
+To create an order you send a POST request to https://cleancloudapp.com/api/addOrder with the below parameters. You will need the ID of the customer account that you are creating the order for. This ID is obtained when you create a customer using the API.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the customer	Y
+finalTotal	Final value of the order	Y
+status	Status of the order
+0 = Cleaning Order,1 = Order Ready, 2 = Order Completed, 3 = Pickup Requiring Confirmation, 4 = Accepted Pickup, 5 = Detailing
+If not set it will assume the order is a pickup	
+discount	Discount amount applied to order	
+discountPercent	e.g 20 if you want the discount % to stick for an order after editing	
+creditUsed	Amount of credit used with this order
+Will return error if more used than available on customer account	
+deliveryFee	Amount charged for delivery	
+tax	Tax amount applied to the order	
+tax2	Second Tax amount applied to the order	
+tax3	Third Tax amount applied to the order	
+minimumAdjust	Amount applied to raise order to minimum required subtotal	
+tip	Tip amount applied to the order	
+tipPercent	e.g 20 if you want the tip % to stick for an order after editing	
+express	Specify if the order is express or not. 0 = Normal, 1 = Express	
+products	Associative Array of products in the order	
+pickupDate	Unix timestamp of pickup date, set without timezone at 12pm UTC time	
+pickupStart	Start time for pickup, set with 12 hour clock (e.g. 10am)	
+pickupEnd	End time for pickup, set with 12 hour clock (e.g. 11am)	
+delivery	Whether the order is a delivery or not 1 = Order will also be a delivery, 0 = no delivery	
+deliveryDate	Unix timestamp of delivery date, set without timezone at 12pm UTC time	
+deliveryStart	Start time for delivery, set with 12 hour clock (e.g. 10am)	
+deliveryEnd	End time for delivery, set with 12 hour clock (e.g. 11am)	
+orderNotes	Notes for the order	
+notifyMethod	How to notify customer on order status changes1 = SMS, 2 = EMAIL, 3 = DO NOT NOTIFY, 4 = EMAIL & SMS	
+paid	If the order is paid or not.1 = Paid, 0 = Unpaid	
+paymentType	The payment type used 0 = No payment type, 1 = Cash, 2 = Card, 3 = Check	
+priceListID	If you are using a custom price list from CleanCloud, Leave blank or 0 for default	
+sendEmail	Send email notification to the customer. 1 = send them an email	
+staffVerify	Staff need to approve the order in the POS. 1 = require staff approval	
+storeOrder	1 = A regular store order, rather than a pickup and delivery. When set to 1, the following three fields should be provided	
+storeDropOffDate	Unix timestamp of the date the order begins or is given to the store, set without timezone at 12pm UTC time	
+storeReadyByDate	Unix timestamp of the date the order will be ready by, set without timezone at 12pm UTC time	
+storeReadyByTime	e.g. "5pm", if not provided, store default will be used	
+lockerOrder	1 = is an order dropped in a locker by customer	
+lockerNumber	e.g 5 if order put in locker number 5	
+lockerLocationID	If multiple locker locations for a store then provide the ID associated with the locker location	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/addOrder');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerID': '1',
+            'products': [{ 'id': '10', 'price': '45', 'pieces': '1', 'quantity': '1', 'name': 'Product Name'},
+            {'id': '9', 'price': '20', 'pieces': '2', 'quantity': '2', 'name': 'Second Product'},
+            {'id': '0', 'price': '10', 'pieces': '1', 'quantity': '3', 'name': 'Custom Product Name'}],
+            'discount': '1.03',
+            'tax': '1.08',
+            'finalTotal': '10.60',
+            'pickupDate': '1505736000',
+            'pickupStart': '10am',
+            'pickupEnd': '11am',
+            'delivery': '1',
+            'deliveryDate': '1506686400',
+            'deliveryStart': '1pm',
+            'deliveryEnd': '2pm',
+            'orderNotes': 'Notes for the Order',
+            'notifyMethod': '2',
+            'priceListID': ''
+            };
+
+            request.send(JSON.stringify(body));
+        
+Update an Order
+To update an order you send a POST request to https://cleancloudapp.com/api/updateOrder with the below parameters. You will need the ID of the order that you are updating. Only submit the parameters that you wish to update.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	ID of the order	Y
+customerID	ID of the customer	
+finalTotal	Final value of the order	
+discount	Discount amount applied to order	
+discountPercent	e.g 20 if you want the discount % to stick for an order after editing	
+creditUsed	Amount of credit used with this order. You must also provide updated finalTotal.
+Will return error if more used than available on customer account.	
+deliveryFee	Amount charged for delivery	
+tax	Tax amount applied to the order	
+tax2	Second Tax amount applied to the order	
+tax3	Third Tax amount applied to the order	
+minimumAdjust	Amount applied to raise order to minimum required subtotal	
+tip	Tip amount applied to the order	
+tipPercent	e.g 20 if you want the tip % to stick for an order after editing	
+pickupDate	Unix timestamp of pickup date, set without timezone at 12pm UTC time	
+pickupStart	Start time for pickup, set with 12 hour clock (e.g. 10am)	
+pickupEnd	End time for pickup, set with 12 hour clock (e.g. 11am)	
+delivery	Whether the order is a delivery or not (1 or 0)	
+deliveryDate	Unix timestamp of delivery date, set without timezone at 12pm UTC time	
+deliveryStart	Start time for delivery, set with 12 hour clock (e.g. 10am)	
+deliveryEnd	End time for delivery, set with 12 hour clock (e.g. 11am)	
+orderNotes	Notes for the order	
+notifyMethod	How to notify customer on order status changes1 = SMS, 2 = EMAIL, 3 = DO NOT NOTIFY, 4 = EMAIL & SMS	
+paid	If the order is paid or not.1 = Paid, 0 = Unpaid	
+paymentType	The payment type used 0 = No payment type, 1 = Cash, 2 = Card, 3 = Check	
+priceListID	If you are using a custom price list from CleanCloud, Leave blank or 0 for default	
+pickupReschedule	1 if staff requested reschedule, 2 if rescheduled by customer	
+deliveryReschedule	1 if staff requested reschedule, 2 if rescheduled by customer	
+status	The status of the order. 4 = Awaiting Pickup, 0 = Cleaning, 1 = Cleaned and Ready to Deliver, 2 = Completed, 5 = Detailing	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/updateOrder');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'orderID': '1',
+            'status': '2'
+            };
+
+            request.send(JSON.stringify(body));
+
+        
+Delete an Order
+You can delete an existing order by sending a POST request to https://cleancloudapp.com/api/deleteOrder with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	ID of the order	Y
+checkPickupTime	1 = Check if the order is too close to pickup time before deleting it.
+It will return error if too close to pickup.	
+sendEmail	1 = Send Email to Notify the Admin and Store of Deletion	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/deleteOrder');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'orderID': '1'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Get a Garment
+You can get information about a particular garment in an order by sending a POST request to https://cleancloudapp.com/api/getGarment with the below parameters.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	ID of the order	Y
+barcodeID	Barcode ID/Number of the garment	Y
+Get All Garments in an Order
+You can get information about all individual garments of a particular order by sending a POST request to https://cleancloudapp.com/api/getGarments with the below parameters.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	ID of the order	Y
+Update a Garment
+You can update details about an existing garment by sending a POST request to https://cleancloudapp.com/api/updateGarment with the below parameters. Only send the optional fields that you wish to update.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+barcodeID	Barcode ID/Number of the garment	Y
+orderID	ID of the order. Send this if barcodeID is not unique and you need to limit to the barcode on a particular order	N
+color1	Color ID of the garment	
+color2	Second Color ID of the garment	
+extraNotes	Any notes about the garment	
+conveyorLocation	Where the garment is on an assembly/storage conveyor	
+customStatus	Custom field for you to track the garment status. Numbers only	
+Create Repeat Pickup
+Create a Repeat Pickup scheduler by sending a POST request to https://cleancloudapp.com/api/repeatPickup with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the customer	Y
+pickupDate	Unix timestamp of first pickup date, set without timezone at 12pm UTC time	Y
+pickupStart	Start time for pickup, set with 12 hour clock (e.g. 11am)	Y
+pickupEnd	End time for pickup, set with 12 hour clock (e.g. 1pm)	Y
+frequency	How often the pickup should repeat
+1=Every week, 2=Every 2 weeks, 3=Every 3 weeks, 4=Every 4 weeks	Y
+duration	How many times this pickup should repeat
+0=Until cancelled, 1=1 order, 2=2 orders, ... 20 = 20 orders	Y
+deliveryDays	How many days after the pickup the delivery should be
+0=Do not set, 1= +1 day from Pickup, 2= +2 days, 3= +3 days...	
+deliveryStart	Start time for delivery, set with 12 hour clock (e.g. 11am)	
+deliveryEnd	End time for delivery, set with 12 hour clock (e.g. 1pm)	
+tip	How much tip to apply to each repeat order
+e.g. 3.5	
+tipPercent	e.g 20 if you want the tip % to stick for an order after editing	
+schedulerType	0 = regular, 1 = requires SMS confirmation from customer each order before creating order
+schedulerConfirmDays	How many days in advance of pickup the confirm order SMS is sent to customer
+(Only required if schedulerType set to 1)	
+ordersCreatedSoFar	Number of orders that have already been created for this repeat pickup before scheduler created
+e.g. 0 or 1	
+deleteOld	Delete any old repeat pickups for this customer
+1 = delete	
+Update Repeat Pickup
+Update an Existing Repeat Pickup scheduler by sending a POST request to https://cleancloudapp.com/api/updateRepeatPickup with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+pickupID	ID of the repeat pickup	Y
+customerID	ID of the customer	Y
+pickupDate	Unix timestamp of next pickup date, set without timezone at 12pm UTC time	Y
+pickupStart	Start time for pickup, set with 12 hour clock (e.g. 11am)	Y
+pickupEnd	End time for pickup, set with 12 hour clock (e.g. 1pm)	Y
+frequency	How often the pickup should repeat
+1=Every week, 2=Every 2 weeks, 3=Every 3 weeks, 4=Every 4 weeks	Y
+duration	How many times this pickup should repeat
+0=Until cancelled, 1=1 order, 2=2 orders, ... 20 = 20 orders	Y
+deliveryDays	How many days after the pickup the delivery should be
+0=Do not set, 1= +1 day from Pickup, 2= +2 days, 3= +3 days...	
+deliveryStart	Start time for delivery, set with 12 hour clock (e.g. 11am)	
+deliveryEnd	End time for delivery, set with 12 hour clock (e.g. 1pm)	
+tip	How much tip to apply to each repeat order
+e.g. 3.5	
+tipPercent	e.g 20 if you want the tip % to stick for an order after editing	
+schedulerType	0 = regular, 1 = requires SMS confirmation from customer each order before creating order
+schedulerConfirmDays	How many days in advance of pickup the confirm order SMS is sent to customer
+(Only required if schedulerType set to 1)	
+Delete Repeat Pickup
+Delete a Repeat Pickup for a customer by sending a POST request to https://cleancloudapp.com/api/deletePickup with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+pickupID	ID of the repeat pickup	Y
+customerID	ID of the customer	Y
+Get Repeat Pickups
+Get a list of Repeat Pickups for a customer by sending a POST request to https://cleancloudapp.com/api/getPickups with the below parameters
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the customer	Y
+Create Message
+This POST request to https://cleancloudapp.com/api/addMessage allows you send a message from the customer to the store.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the customer	Y
+message	Message for the store	Y
+Get List of Messages
+This POST request to https://cleancloudapp.com/api/getMessages allows you to return a JSON response of the messaging history with a customer.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the customer	Y
+limit	How many messages to return, leave empty for all	
+Get List of Orders
+This POST request to https://cleancloudapp.com/api/getOrders allows you to return a JSON response of details for a particular order or multiple orders, which can be filtered using the parameters below.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	ID of the order	
+customerID	ID of the customer	
+routeID	ID of the pickup and delivery route	
+dateFrom	Beginning date of orders (yyyy-mm-dd)	
+dateTo	End date of orders (yyyy-mm-dd)	
+status	Status of the order(s)
+4 = Awaiting Pickup, 0 = Cleaning, 1 = Cleaned and Ready to Deliver, 2 = Completed	
+completed	If order(s) have been completed or not. 0 = not complete, 1 = complete	
+paid	If order(s) have been paid or not. 0 = not paid, 1 = paid	
+sendProductDetails	Set to 1 if you require detailed information about the products on the order(s)	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getOrders');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerID': '1'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Get List of Products
+This POST request to https://cleancloudapp.com/api/getProducts allows you to return a JSON response of all active products, by sending the following parameters.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+priceListID	ID of the price list	
+sendParents	If you want to receive parent products in the response (1 or 0)	
+sendUpcharges	If you want to receive upcharges in the response (1 or 0)	
+inStore	1 = See products how they appear in store POS.
+Otherwise it will send for customer app	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getProducts');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'priceListID': ''
+            };
+
+            request.send(JSON.stringify(body));
+
+        
+Get Available Pickup/Delivery Dates
+This POST request to https://cleancloudapp.com/api/getDates allows you to return a JSON response of all the available pickup and delivery dates with their available slot times for a particular route, by sending the following parameters. The response will contain a list of dates, with available slot times and the remaining number of available slots.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+routeID	ID of the Route	Y
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getDates');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'routeID': '1'
+            };
+
+            request.send(JSON.stringify(body));
+
+        
+Get Available Pickup/Delivery Times
+This POST request to https://cleancloudapp.com/api/getSlots allows you to return a JSON response of all the available pickup and delivery slots for a particular route on a particular day, by sending the following parameters. The response will contain a comma separated list of available slot times.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+routeID	ID of the Route	Y
+day	Unix Timestamp of the Day without timezone at 12pm UTC time	Y
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getSlots');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'routeID': '1',
+            'day': '1558353600'
+            };
+
+            request.send(JSON.stringify(body));
+
+        
+Get Route Number from Latitude/Longitude or Address
+This POST request to https://cleancloudapp.com/api/getRoute allows you to send in latitude/longitude values for a customer's address or their street address and the response will provide a JSON response with the route number. If no route is available for that route an error will return.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+lat	Latitude of the address	
+lng	Longitude of the address	
+customerAddress	Customer street address if you don't know lat/lng	
+routeID	Route ID, if you want to check lat/lng is in this route	
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getRoute');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'lat': '10.14',
+            'lng': '34.43'
+            };
+
+            request.send(JSON.stringify(body));
+
+        
+Get Referral Code and Gift
+This POST request to https://cleancloudapp.com/api/getReferral allows you to get the unique referral code for a customer and the gift that they and the customer they they refer will receive
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+Javascript Code Example
+
+
+            var request = new XMLHttpRequest();
+
+            request.open('POST', 'https://cleancloudapp.com/api/getReferral');
+
+            request.setRequestHeader('Content-Type', 'application/json');
+
+            request.onreadystatechange = function () {
+            if (this.readyState === 4) {
+            console.log('Status:', this.status);
+            console.log('Headers:', this.getAllResponseHeaders());
+            console.log('Body:', this.responseText);
+            }
+            };
+
+            var body = {
+            'api_token': 'MY_API_TOKEN',
+            'customerID': '1'
+            };
+
+            request.send(JSON.stringify(body));
+        
+Use Promo Code
+This POST request to https://cleancloudapp.com/api/usePromo allows you use a promo code. This will update the customer's account with their new discount/credit level and the response will contain the discount percentage or credit amount to apply to the customer's order
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+promoCode	The promo code	Y
+onlyCheckIfValid	Only check if promo code is valid for this customer.
+Set to 1 if you only want to check validity but don't want to use it	
+Convert Loyalty Points to Credit
+This POST request to https://cleancloudapp.com/api/convertLoyaltyPoints allows you convert a customer's unused loyalty points to credit. This will update the customer's account with their new total credit level and the response will contain information about the new total credit amount as well as the credit gained
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+Add Subscription to Customer Account
+This POST request to https://cleancloudapp.com/api/addSubscription allows you to subscribe a customer to a regular subscription created in Clearent/Stripe and begin charging them. If the Error response is "3D Secure Authentication required", then you will need to prompt the user to authenticate, then send again with subscriptionConfirmed = 1 if authentication was successful.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+subscriptionID	plan ID of subscription e.g. plan_JNIndsfsdfvc	Y
+subscriptionConfirmed	Only set to 1 if 3D Secure Authentication was triggered by previous response and was successfully authenticated	
+Delete Subscription from a Customer Account
+This POST request to https://cleancloudapp.com/api/deleteSubscription allows you to delete the subscription on a customer's account.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+Add Credit Card to Customer Account
+This POST request to https://cleancloudapp.com/api/addCard allows you to add a credit card to a customer account by sending in the card token
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+type	1 = Stripe save card
+2 = Stripe request setup intent secret
+3 = Clearent Save Card	Y
+paymentMethodID	The payment method ID or token for the tokenized card from Stripe / Clearent	
+Charge Saved Credit Card
+This POST request to https://cleancloudapp.com/api/chargeCard allows you to charge a customers saved credit card for an order
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+orderID	ID of the Order	Y
+type	1 = Stripe
+2 = EVO
+3 = Clearent
+4 = Checkout.com
+5 = CleanCloud Pay	Y
+Get Saved Credit Cards
+This POST request to https://cleancloudapp.com/api/getCards allows you to fetch all of the saved cards for a customer
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+type	3 = Clearent
+5 = CleanCloud Pay	Y
+Set Default Credit Card
+This POST request to https://cleancloudapp.com/api/setDefaultCard allows you to set the default card for a customer
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+customerID	ID of the Customer	Y
+cardID	ID of the Card, obtained from api/getCards endpoint	Y
+type	3 = Clearent
+5 = CleanCloud Pay	Y
+Add Push Token
+This POST request to https://cleancloudapp.com/api/addPushToken allows you to send a Firebase push notification authentication token from your customer iOS/Android app into CleanCloud. This is so that CleanCloud can automatically send a push token to your customer when their order status changes or if you would like to send them marketing from CleanCloud.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+pushToken	The push token provided by the app	Y
+customerID	ID of the Customer	Y
+platform	0 = Android, 1 = iOS	Y
+bundleID	The bundle ID of your iOS & Android app (e.g. com.companyname.appname)	Y
+Delete Push Token
+This POST request to https://cleancloudapp.com/api/deletePushToken allows you to delete a Firebase push notification authentication token from your customer database after the customer logs out of or uninstalls your app. This is so you do not try to send push notifications to a customer that is no longer using your app.
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+pushToken	The push token provided by the app that you wish to delete	Y
+customerID	ID of the Customer	Y
+Get Summary Metrics Report By Day
+This POST request to https://cleancloudapp.com/api/summaryReport allows you to get summary metrics for your store
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+dateFrom	Beginning Date (yyyy-mm-dd)	Y
+dateTo	End Date (yyyy-mm-dd)	Y
+Get Driver Location
+This POST request to https://cleancloudapp.com/api/driverLocation allows you to get the most recent location of a driver based on the order ID associated with a customer
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	Order ID	Y
+customerID	Customer ID	Y
+Get Photos
+This POST request to https://cleancloudapp.com/api/getPhotos allows you to get the photos associated with an order
+
+Parameter	Description	Required
+api_token	Your secret API token	Y
+orderID	Order ID	Y
+customerID	Customer ID	Y
